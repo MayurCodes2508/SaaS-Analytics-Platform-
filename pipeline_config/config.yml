@@ -1,0 +1,83 @@
+sources:
+  - name: airflow_branches
+    repo: apache/airflow
+    endpoint: branches
+    cursor_field: null   
+    primary_key: name
+    table: branches
+
+  - name: airflow_issues
+    repo: apache/airflow
+    endpoint: issues
+    cursor_field: updated_at
+    primary_key: id
+    table: issues
+
+  - name: airflow_pull_requests
+    repo: apache/airflow
+    endpoint: pulls
+    cursor_field: updated_at  
+    primary_key: id
+    table: pull_requests
+
+  - name: airflow_commits
+    repo: apache/airflow
+    endpoint: commits
+    cursor_field: commit.author.date
+    primary_key: sha
+    table: commits
+
+  - name: airflow_stargazers
+    repo: apache/airflow
+    endpoint: stargazers
+    cursor_field: starred_at  
+    primary_key: user.id
+    table: stargazers
+
+  - name: kubernetes_branches
+    repo: kubernetes/kubernetes
+    endpoint: branches
+    cursor_field: null
+    primary_key: name
+    table: branches
+
+  - name: kubernetes_issues
+    repo: kubernetes/kubernetes
+    endpoint: issues
+    cursor_field: updated_at
+    primary_key: id
+    table: issues
+
+  - name: kubernetes_commits
+    repo: kubernetes/kubernetes
+    endpoint: commits
+    cursor_field: commit.author.date
+    primary_key: sha
+    table: commits
+
+  - name: kubernetes_stargazers
+    repo: kubernetes/kubernetes
+    endpoint: stargazers
+    cursor_field: starred_at
+    primary_key: user.id
+    table: stargazers
+
+destination:
+  type: bigquery
+  project_id: instant-medium-491107-t6
+  dataset: raw
+  write_disposition: WRITE_APPEND
+
+storage:
+  raw_bucket_name: raw-data-bucket-github
+  raw_path: raw/github
+  
+  processed_bucket_name: processed-data-bucket-github
+  processed_path: processed/github
+
+runtime:
+  lookback_days: 2
+  page_size: 100
+  max_pages: 50
+  request_timeout: 10
+  retry_attempts: 3

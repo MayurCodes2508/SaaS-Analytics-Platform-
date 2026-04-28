@@ -1,0 +1,38 @@
+name: orchestrator_1hr
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:  
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'     
+      
+      - name: OAuth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/144449440045/locations/global/workloadIdentityPools/github-worker-pool/providers/github-provider'
+          service_account: 'github-hub-workflows@instant-medium-491107-t6.iam.gserviceaccount.com'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run Pipeline
+        env: 
+          PAT_GITHUB_API_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_API_AUTH_TOKEN }}
+        run: |
+          python orchestrator/run_pipeline.py incremental
